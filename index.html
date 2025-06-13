@@ -3,23 +3,23 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>통합 택배 지도</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>택배 통합 지도</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=95b203d7a3ee9d91db51514098523f67&libraries=services"></script>
 </head>
 <body>
   <div class="container">
-    <h1>통합 택배 지도</h1>
-    <div class="form">
-      <input type="text" id="address" placeholder="주소 입력 (예: 수원시 장안구 장안로 271)" />
-      <input type="text" id="invoice" placeholder="송장번호 입력" />
-      <select id="source">
-        <option value="딜리래빗">딜리래빗</option>
-        <option value="핑퐁">핑퐁</option>
+    <h1>택배 위치 등록</h1>
+    <form id="location-form">
+      <input type="text" id="address" placeholder="주소 입력" required />
+      <input type="text" id="tracking" placeholder="송장번호" required />
+      <select id="type">
+        <option value="dilly">딜리래빗</option>
+        <option value="pingpong">핑퐁</option>
       </select>
-      <button onclick="addMarker()">추가</button>
-    </div>
+      <button type="submit">추가</button>
+    </form>
     <div id="map"></div>
   </div>
   <script src="script.js"></script>
