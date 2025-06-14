@@ -4,23 +4,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>택배 위치 통합 지도</title>
+  <title>택배 위치 등록</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=Z2DCf1YXF5rG8to2AS7w2D1Z1jkUEnjai4WGR4C"></script>
+  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=95b203d7a3ee9d91db51514098523f67&libraries=services"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>택배 위치 통합 지도</h1>
-    <input type="text" id="address" placeholder="주소 입력 (예: 경기도 수원시 장안구 장안로 271)" />
-    <input type="text" id="tracking" placeholder="송장번호 입력" />
-    <select id="type">
+  <h1>택배 위치 등록</h1>
+  <div class="form">
+    <input type="text" id="address" placeholder="주소를 입력하세요" />
+    <input type="text" id="trackingNumber" placeholder="송장번호를 입력하세요" />
+    <select id="courier">
       <option value="dilly">딜리래빗</option>
       <option value="pingpong">핑퐁</option>
     </select>
     <button onclick="addMarker()">추가</button>
-    <div id="count"></div>
-    <div id="map" class="map-container"></div>
+    <span id="countDisplay">0개 등록됨</span>
   </div>
+  <div id="map"></div>
   <script src="script.js"></script>
 </body>
 </html>
