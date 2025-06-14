@@ -1,95 +1,86 @@
 
 let map;
-let geocoder;
 let markers = [];
 
+const INITIAL_LAT = 37.305148;
+const INITIAL_LNG = 126.989992;
+
+function saveToLocal(data) {
+  const now = new Date();
+  const reset = new Date(now);
+  reset.setHours(24, 0, 0, 0);
+  localStorage.setItem("markerData", JSON.stringify(data));
+  localStorage.setItem("expire", reset.toISOString());
+}
+
+function loadFromLocal() {
+  const expire = new Date(localStorage.getItem("expire"));
+  if (new Date() > expire) {
+    localStorage.removeItem("markerData");
+    localStorage.removeItem("expire");
+    return [];
+  }
+  const data = localStorage.getItem("markerData");
+  return data ? JSON.parse(data) : [];
+}
+
+function updateCount() {
+  document.getElementById("count").innerText = "등록된 위치: " + markers.length + "개";
+}
+
 function initMap() {
-    map = new kakao.maps.Map(document.getElementById('map'), {
-        center: new kakao.maps.LatLng(37.5665, 126.9780),
-        level: 3
-    });
-    geocoder = new kakao.maps.services.Geocoder();
-    loadMarkers();
-    scheduleResetAtMidnightKST();
+  map = new Tmapv2.Map("map", {
+    center: new Tmapv2.LatLng(INITIAL_LAT, INITIAL_LNG),
+    width: "100%",
+    height: "500px",
+    zoom: 15,
+  });
+
+  const stored = loadFromLocal();
+  stored.forEach(item => placeMarker(item));
+  updateCount();
 }
 
 function addMarker() {
-    const address = document.getElementById('address').value.trim();
-    const trackingNumber = document.getElementById('trackingNumber').value.trim();
-    const appType = document.getElementById('appType').value;
+  const address = document.getElementById("address").value.trim();
+  const tracking = document.getElementById("tracking").value.trim();
+  const type = document.getElementById("type").value;
 
-    if (!address || !trackingNumber) {
-        alert('주소와 송장번호를 입력하세요.');
-        return;
-    }
+  if (!address || !tracking) {
+    alert("주소와 송장번호를 모두 입력하세요.");
+    return;
+  }
 
-    geocoder.addressSearch(address, function(result, status) {
-        if (status === kakao.maps.services.Status.OK) {
-            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-            const imageSrc = appType === '딜리래빗' ? 'marker-blue.png' : 'marker-black.png';
-            const imageSize = new kakao.maps.Size(32, 32);
-            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
-            const marker = new kakao.maps.Marker({
-                map: map,
-                position: coords,
-                image: markerImage
-            });
-            const info = new kakao.maps.InfoWindow({
-                content: `<div>${trackingNumber}</div>`
-            });
-            info.open(map, marker);
-            markers.push({ address, trackingNumber, appType, lat: result[0].y, lng: result[0].x });
-            saveMarkers();
-            updateCountDisplay();
-            map.setCenter(coords);
-        } else {
-            alert('주소를 찾을 수 없습니다.');
-        }
-    });
+  fetch(`https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=Z2DCf1YXF5rG8to2AS7w2D1Z1jkUEnjai4WGR4C&fullAddr=${encodeURIComponent(address)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.coordinateInfo && data.coordinateInfo.coordinate.length > 0) {
+        const coord = data.coordinateInfo.coordinate[0];
+        const lat = parseFloat(coord.lat);
+        const lon = parseFloat(coord.lon);
+
+        const item = { lat, lon, tracking, type };
+        placeMarker(item);
+        const saved = loadFromLocal();
+        saved.push(item);
+        saveToLocal(saved);
+        updateCount();
+      } else {
+        alert("주소를 찾을 수 없습니다.");
+      }
+    })
+    .catch(() => alert("주소 변환 중 오류가 발생했습니다."));
 }
 
-function saveMarkers() {
-    localStorage.setItem('markerData', JSON.stringify(markers));
-}
-
-function loadMarkers() {
-    const data = localStorage.getItem('markerData');
-    if (data) {
-        markers = JSON.parse(data);
-        markers.forEach(({ lat, lng, trackingNumber, appType }) => {
-            const coords = new kakao.maps.LatLng(lat, lng);
-            const imageSrc = appType === '딜리래빗' ? 'marker-blue.png' : 'marker-black.png';
-            const imageSize = new kakao.maps.Size(32, 32);
-            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
-            const marker = new kakao.maps.Marker({
-                map: map,
-                position: coords,
-                image: markerImage
-            });
-            const info = new kakao.maps.InfoWindow({
-                content: `<div>${trackingNumber}</div>`
-            });
-            info.open(map, marker);
-        });
-        updateCountDisplay();
-    }
-}
-
-function updateCountDisplay() {
-    document.getElementById('countDisplay').innerText = `총 등록 수: ${markers.length}`;
-}
-
-function scheduleResetAtMidnightKST() {
-    const now = new Date();
-    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-    const koreaNow = new Date(utc + 9 * 60 * 60 * 1000);
-    const nextMidnight = new Date(koreaNow);
-    nextMidnight.setHours(24, 0, 0, 0);
-    const msUntilMidnight = nextMidnight - koreaNow;
-    setTimeout(() => {
-        localStorage.removeItem("markerData");
-        location.reload();
-    }, msUntilMidnight);
+function placeMarker({ lat, lon, tracking, type }) {
+  const icon = type === "dilly" ? "dilly.png" : "pingpong.png";
+  const marker = new Tmapv2.Marker({
+    position: new Tmapv2.LatLng(lat, lon),
+    icon: icon,
+    map: map,
+    title: `송장번호: ${tracking}`
+  });
+  markers.push(marker);
 }
 
 window.onload = initMap;

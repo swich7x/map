@@ -2,25 +2,25 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>택배 통합 지도</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>택배 위치 통합 지도</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=Z2DCf1YXF5rG8to2AS7w2D1Z1jkUEnjai4WGR4C"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>택배 위치 등록</h1>
-        <input type="text" id="address" placeholder="주소 입력" />
-        <input type="text" id="trackingNumber" placeholder="송장번호 입력" />
-        <select id="appType">
-            <option value="딜리래빗">딜리래빗</option>
-            <option value="핑퐁">핑퐁</option>
-        </select>
-        <button onclick="addMarker()">추가</button>
-        <span id="countDisplay"></span>
-        <div id="map"></div>
-    </div>
-    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=95b203d7a3ee9d91db51514098523f67&libraries=services"></script>
-    <script src="script.js"></script>
+  <div class="container">
+    <h1>택배 위치 통합 지도</h1>
+    <input type="text" id="address" placeholder="주소 입력 (예: 경기도 수원시 장안구 장안로 271)" />
+    <input type="text" id="tracking" placeholder="송장번호 입력" />
+    <select id="type">
+      <option value="dilly">딜리래빗</option>
+      <option value="pingpong">핑퐁</option>
+    </select>
+    <button onclick="addMarker()">추가</button>
+    <div id="count"></div>
+    <div id="map" class="map-container"></div>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
